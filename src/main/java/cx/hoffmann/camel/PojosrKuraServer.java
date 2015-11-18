@@ -16,16 +16,15 @@ public class PojosrKuraServer {
     public PojosrKuraServer() {
     }
 
-    public KuraRouter start(Class<? extends KuraRouter> kuraRouter) {
+    public <T extends KuraRouter> T start(Class<T> kuraRouter) {
         registry = KuraRegistry.getInstance().getRegistry();
-        KuraRouter router = null;
+        T router = null;
         try {
-            log.info("Starting router...");
+            log.debug("Starting router for class {}...", kuraRouter.getName());
             router = kuraRouter.newInstance();
             router.start(registry.getBundleContext());
         } catch (Exception e) {
-            log.error("Failing to start router....");
-            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         return router;
@@ -33,7 +32,7 @@ public class PojosrKuraServer {
 
     public static void init() {
         PojosrKuraServer pojosrKuraServer = new PojosrKuraServer();
-        MyKuraRouter myKuraRouter = (MyKuraRouter) pojosrKuraServer.start(MyKuraRouter.class);
+        MyKuraRouter myKuraRouter = pojosrKuraServer.start(MyKuraRouter.class);
     }
 
     public static void main(String[] args) {
